@@ -6,7 +6,6 @@ from ncps.torch import CfC
 
 RNN_TYPE = "GRU"
 bCrossOver = True
-layerCnt = 4
 class ERB(nn.Module):
     def __init__(self, erb_subband_1, erb_subband_2, nfft=512, high_lim=8000, fs=16000):
         super().__init__()
@@ -512,7 +511,7 @@ class DPGRNN_LSTM(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self):
+    def __init__(self, layerCnt = 4):
         super().__init__()
         if layerCnt == 8:
             self.en_convs = nn.ModuleList([
@@ -601,7 +600,7 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self):
+    def __init__(self, layerCnt = 4):
         super().__init__()
         if layerCnt == 8:
             self.de_convs = nn.ModuleList([
@@ -707,10 +706,10 @@ class Mask(nn.Module):
 
 
 class CGTFCRN(nn.Module):
-    def __init__(self):
+    def __init__(self, convCnt = 4):
         super().__init__()
         self.erb = ERB(65, 64)
-        self.encoder = Encoder()
+        self.encoder = Encoder(convCnt)
         if RNN_TYPE == "CFC":
             self.dpgrnn1 = DPGRNN_CFC(16, 33, 16)
             self.dpgrnn2 = DPGRNN_CFC(16, 33, 16)
@@ -720,7 +719,7 @@ class CGTFCRN(nn.Module):
         else:
             self.dpgrnn1 = DPGRNN(16, 33, 16)
             self.dpgrnn2 = DPGRNN(16, 33, 16)
-        self.decoder = Decoder()
+        self.decoder = Decoder(convCnt)
         self.mask = Mask()
 
     def forward(self, spec):
