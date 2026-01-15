@@ -583,6 +583,14 @@ class Encoder(nn.Module):
                 CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(2, 1), use_deconv=False),
                 CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(4, 1), use_deconv=False, bLastLayer=True)
             ])
+        elif layerCnt == 2:
+            self.en_convs = nn.ModuleList([
+                ConvBlock(3, 16, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=False, is_last=False),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=False, is_last=False),
+                # TFCM(16, (3, 3), bDecConv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(1, 1), use_deconv=False),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(0, 1), dilation=(3, 1), use_deconv=False, bLastLayer=True)
+            ])
 
     def forward(self, x):
         en_outs = []
@@ -662,6 +670,15 @@ class Decoder(nn.Module):
             self.de_convs = nn.ModuleList([
                 CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 4, 1), dilation=(4, 1), use_deconv=True),
                 CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 2, 1), dilation=(2, 1), use_deconv=True),
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True,
+                       bLastLayer=True),
+                # TFCM(16, (3, 3), bDecConv=True),
+                ConvBlock(16, 16, (1, 5), stride=(1, 2), padding=(0, 2), groups=2, use_deconv=True, is_last=False),
+                ConvBlock(16, 2, (1, 5), stride=(1, 2), padding=(0, 2), use_deconv=True, is_last=True)
+            ])
+        elif layerCnt == 2:
+            self.de_convs = nn.ModuleList([
+                CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 3, 1), dilation=(3, 1), use_deconv=True),
                 CGTFCM(16, 8, (3, 3), stride=(1, 1), padding=(2 * 1, 1), dilation=(1, 1), use_deconv=True,
                        bLastLayer=True),
                 # TFCM(16, (3, 3), bDecConv=True),
