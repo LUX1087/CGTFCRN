@@ -3,13 +3,17 @@ import torch
 import soundfile as sf
 from train.cgtfcrn import CGTFCRN
 
+CGTFCMCnt = 4
 ## load model
 device = torch.device("cpu")
-model = CGTFCRN().eval()
+model = CGTFCRN(convCnt=CGTFCMCnt).eval()
 total_params=sum(p.numel() for p in model.parameters() if p.requires_grad)
 print(f"Total number of parameters:{total_params}")
 #torch.save(model,"checkpoints/new.pth")
-ckpt = torch.load(os.path.join('checkpoints', 'model_0120.tar'), map_location=device)
+if CGTFCMCnt == 4:
+    ckpt = torch.load(os.path.join('checkpoints', 'model_0120.tar'), map_location=device)
+elif CGTFCMCnt == 3:
+    ckpt = torch.load(os.path.join('checkpoints', 'model_0120_3.tar'), map_location=device)
 model.load_state_dict(ckpt['model'])
 
 test_file_list=[
